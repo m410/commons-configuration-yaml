@@ -1,0 +1,12 @@
+*.iml
+target/
+documents/
+docs/
+.idea/
+gix/
+flyway.properties
+.project
+.classpath
+.settings/
+/database/
+/eclipse/

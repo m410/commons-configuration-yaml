@@ -1,0 +1,80 @@
+#
+# https://gist.github.com/SkiftCreative/c41c2ca07971fd934724
+#
+# These settings are for any web project
+
+# Handle line endings automatically for files detected as text
+# and leave all files detected as binary untouched.
+* text=auto
+
+#
+# The above will handle all files NOT found below
+#
+
+# Documents
+*.doc	   diff=astextplain eol=lf
+*.DOC	   diff=astextplain eol=lf
+*.docx     diff=astextplain eol=lf
+*.DOCX     diff=astextplain eol=lf
+*.dot      diff=astextplain eol=lf
+*.DOT      diff=astextplain eol=lf
+*.pdf      diff=astextplain eol=lf
+*.PDF	   diff=astextplain eol=lf
+*.rtf	   diff=astextplain eol=lf
+*.RTF	   diff=astextplain eol=lf
+*.md       text             eol=lf
+*.adoc     text             eol=lf
+*.textile  text             eol=lf
+*.mustache text             eol=lf
+*.csv      text             eol=lf
+*.tab      text             eol=lf
+*.tsv      text             eol=lf
+*.sql      text             eol=lf
+
+# Graphics
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.svg  text eol=lf
+
+# These files are text and should be normalized (Convert crlf => lf)
+*.md       text eol=lf
+*.adoc     text eol=lf
+*.textile  text eol=lf
+*.mustache text eol=lf
+*.csv      text eol=lf
+*.tab      text eol=lf
+*.tsv      text eol=lf
+*.php      text eol=lf
+*.css      text eol=lf
+*.js       text eol=lf
+*.json     text eol=lf
+*.htm      text eol=lf
+*.html     text eol=lf
+*.xml      text eol=lf
+*.txt      text eol=lf
+*.ini      text eol=lf
+*.inc      text eol=lf
+*.pl       text eol=lf
+*.rb       text eol=lf
+*.py       text eol=lf
+*.scm      text eol=lf
+*.sql      text eol=lf
+.htaccess  text eol=lf
+
+# These files are binary and should be left untouched
+# (binary is a macro for -text -diff)
+*.mov  binary
+*.mp4  binary
+*.mp3  binary
+*.flv  binary
+*.fla  binary
+*.swf  binary
+*.gz   binary
+*.zip  binary
+*.7z   binary
+*.ttf  binary
+*.pyc  binary
+
