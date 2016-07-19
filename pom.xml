@@ -3,12 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.m410</groupId>
-    <artifactId>config</artifactId>
+    <artifactId>yaml-configuration</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-
-    <name>config</name>
-    <url>http://maven.apache.org</url>
+    <description>
+        Built on top of Snake Yaml and Apache Commons Configuration, this provides a way
+        to use YAML as it's file format.
+    </description>
+    <name>yaml-configuration</name>
+    <url>http://m410.github.org</url>
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
