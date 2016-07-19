@@ -7,6 +7,7 @@ import org.apache.commons.configuration2.interpol.ConfigurationInterpolator;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.*;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -15,28 +16,21 @@ import static org.junit.Assert.*;
  * @author Michael Fortin
  */
 public class YamlConfigurationTest {
+    YamlConfiguration config;
 
     @Before
     public void setUp() throws Exception {
-
-    }
-
-    @Test
-    public void read() throws Exception {
         Parameters params = new Parameters();
         FileBasedConfigurationBuilder<YamlConfiguration> builder =
                 new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                         .configure(params.xml().setFileName("src/test/resource/test1.yml"));
 
-        YamlConfiguration config = builder.getConfiguration();
+        config = builder.getConfiguration();
+    }
+
+    @Test
+    public void read() throws Exception {
         assertNotNull(config);
-
-        System.out.println(config.getRootElementName());
-        final Iterator<String> keys = config.getKeys();
-
-        while (keys.hasNext()) {
-            System.out.println(keys.next());
-        }
 
         try{
             config.getBoolean("test-empty");
@@ -50,7 +44,7 @@ public class YamlConfigurationTest {
         assertEquals("test value",config.getString("test-string"));
         assertEquals("test value",config.getString("test-place"));
         assertEquals("test value",config.getString("test-interp"));
-        assertEquals("/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home",config.getString("test-env"));
+//        assertEquals("/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home",config.getString("test-env"));
         assertEquals(12,config.getInt("test-int"));
         assertEquals(Integer.valueOf(12),config.getInteger("test-int",0));
         assertEquals(true,config.getBoolean("test-boolean"));
@@ -66,8 +60,9 @@ public class YamlConfigurationTest {
 
     @Test
     public void write() throws Exception {
-
+        final StringWriter file = new StringWriter();
+        config.write(file);
+        String out = file.toString();
+        assertTrue(out.contains("test-int: 12"));
     }
-
-
 }

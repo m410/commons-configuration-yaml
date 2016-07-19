@@ -84,6 +84,17 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     }
 
     private Object fromNodeMap(NodeHandler<ImmutableNode> nodeHandler) {
-        return null;
+        return toMap(nodeHandler);
+    }
+
+    private Object toMap(NodeHandler<ImmutableNode> nodeHandler) {
+        final ImmutableNode node = nodeHandler.getRootNode();
+        Map<String, Object> map = new HashMap<>();
+
+        for (ImmutableNode immutableNode : node.getChildren()) {
+            map.put(immutableNode.getNodeName(),immutableNode.getValue());
+        }
+
+        return map;
     }
 }
