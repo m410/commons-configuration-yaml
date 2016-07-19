@@ -1,0 +1,29 @@
+#test file
+test-string: &anchor test value 2
+test-int: 1222
+test-boolean: false
+
+test-interp: ${test-string}
+test-place: *anchor
+test-env: ${env:JAVA_HOME}
+test-nested2:
+  one: one
+  two: two
+  three: three
+  four:
+    four-sub1: sub1
+    four-sub2: sub2
+    four-sub3: sub3
+test-collection2:
+  - one
+  - two
+  - three
+test-long-string2: |
+   this is a really
+   long string
+   with line brakes
+test-collection-of-map2:
+  - {key: one}
+  - {key: two}
+  - {key: three}
+test string with spaces: test spaces
