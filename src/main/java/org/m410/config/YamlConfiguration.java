@@ -3,9 +3,9 @@ package org.m410.config;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.configuration2.BaseHierarchicalConfiguration;
@@ -37,7 +37,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     public void read(Reader in) throws ConfigurationException, IOException {
         ImmutableNode.Builder rootBuilder = new ImmutableNode.Builder();
         ImmutableNode root = rootBuilder.create();
-        Map<ImmutableNode, ?> elemRefMap = toNodeMap(yaml.load(in), root);
+        Map<ImmutableNode, ?> elemRefMap = toNodeMap(yaml.load(in));
         ImmutableNode top = addChildrenToRoot(root, elemRefMap);
         getSubConfigurationParentModel().mergeRoot(top, "yaml", elemRefMap, null, this);
     }
@@ -49,6 +49,13 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             if(elemRefMap.get(immutableNode) instanceof Map) {
                 top = top.addChild(addChildrenToRoot(immutableNode, (Map)elemRefMap.get(immutableNode)));
             }
+            else if(isNodeCollection(elemRefMap.get(immutableNode))){
+                Collection<Map<ImmutableNode, ?>> n = (Collection<Map<ImmutableNode, ?>>)elemRefMap.get(immutableNode);
+
+                for (Map<ImmutableNode, ?> immutableNodeMap : n) {
+                    top = top.addChild(addChildrenToRoot(immutableNode, immutableNodeMap));
+                }
+            }
             else {
                 top = top.addChild(immutableNode);
             }
@@ -57,26 +64,48 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         return top;
     }
 
+    private boolean isNodeCollection(Object o) {
+        // making some assumptions that all elements are the same
+        return o instanceof Collection &&
+               ((Collection)o).size() > 0 &&
+               ((Collection)o).iterator().next() instanceof Map;
+    }
+
     public void write(Writer out) throws ConfigurationException, IOException {
         yaml.dump(fromNodeMap(getModel().getNodeHandler()), out);
     }
 
-    private Map<ImmutableNode, Object> toNodeMap(Object load, ImmutableNode parent) {
+    private Map<ImmutableNode, ?> toNodeMap(Object load) {
         final Map<String,?> map = (Map<String,?>)load;
         final Map<ImmutableNode, Object> nodeMap = new HashMap<>();
 
         for (String key : map.keySet()) {
             Object value = map.get(key);
-            ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
 
             if(value instanceof String || value instanceof Number || value instanceof Boolean) {
+                ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
                 nodeMap.put(currentNode, value);
             }
             else if(value instanceof Map) {
-                nodeMap.put(currentNode, toNodeMap(value, currentNode));
+                ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
+                nodeMap.put(currentNode, toNodeMap(value));
             }
             else if (value instanceof Collection){
-                nodeMap.put(currentNode, value);
+
+                if(isNodeCollection(value)) {
+                    ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
+                    Collection<Map<String, ?>> valueMaps = (Collection<Map<String, ?>>)value;
+                    final ArrayList<Map<ImmutableNode, ?>> maps = new ArrayList<>();
+
+                    for (Map<String, ?> body: valueMaps) {
+                        maps.add(toNodeMap(body));
+                    }
+                    nodeMap.put(currentNode, maps);
+                }
+                else {
+                    ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
+                    nodeMap.put(currentNode, value);
+                }
             }
         }
 

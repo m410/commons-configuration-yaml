@@ -1,12 +1,19 @@
 #test file
-test-string: &anchor test value 2
-test-int: 1222
-test-boolean: false
+string: &anchor test value 2
+int: 1222
+boolean: false
 
-test-interp: ${test-string}
-test-place: *anchor
-test-env: ${env:JAVA_HOME}
-test-nested2:
+interp: ${string}
+place: *anchor
+env: ${env:JAVA_HOME}
+
+test string with spaces: test spaces
+long-string2: |
+   this is a really
+   long string
+   with line brakes
+
+nested2:
   one: one
   two: two
   three: three
@@ -14,16 +21,19 @@ test-nested2:
     four-sub1: sub1
     four-sub2: sub2
     four-sub3: sub3
-test-collection2:
+
+collection:
   - one
   - two
   - three
-test-long-string2: |
-   this is a really
-   long string
-   with line brakes
-test-collection-of-map2:
-  - {key: one}
-  - {key: two}
-  - {key: three}
-test string with spaces: test spaces
+  - four
+
+collection-of-map:
+  - {key: one, version: "1"}
+  - {key: two, version: "2"}
+  - {key: three, version: "2"}
+  - {key: four, version: "1"}
+
+
+module(org.m410.persistence:jpa):
+  user: other
