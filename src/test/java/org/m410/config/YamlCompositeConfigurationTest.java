@@ -3,6 +3,7 @@ package org.m410.config;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.builder.fluent.XMLBuilderParameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.junit.Test;
 
@@ -21,14 +22,14 @@ public class YamlCompositeConfigurationTest {
 
     @Test
     public void testComposite() throws ConfigurationException {
-        final YamlConfiguration defaultConfig =
-                new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                        .configure(new Parameters().xml().setFileName("src/test/resource/test1.yml"))
+        final XMLBuilderParameters defaultParams = new Parameters().xml().setFileName("src/test/resource/test1.yml");
+        final YamlConfiguration defaultConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                        .configure(defaultParams)
                         .getConfiguration();
 
-        final YamlConfiguration overlapConfig=
-                new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                        .configure(new Parameters().xml().setFileName("src/test/resource/test2.yml"))
+        final XMLBuilderParameters overlapParams = new Parameters().xml().setFileName("src/test/resource/test2.yml");
+        final YamlConfiguration overlapConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                        .configure(overlapParams)
                         .getConfiguration();
 
         CompositeConfiguration configuration = new CompositeConfiguration();
@@ -40,12 +41,10 @@ public class YamlCompositeConfigurationTest {
         assertEquals("other",configuration.getString("module(org..m410..persistence:jpa).user"));
         assertEquals("some-password",configuration.getString("module(org..m410..persistence:jpa).password"));
 
-
-
-        assertEquals(4, configuration.getList("collection").size());
-
         assertEquals("one",configuration.getString("collection-of-map(0).key"));
         assertEquals("two",configuration.getString("collection-of-map(1).key"));
         assertEquals("three",configuration.getString("collection-of-map(2).key"));
+
+        assertEquals(6, configuration.getList("collection").size());
     }
 }

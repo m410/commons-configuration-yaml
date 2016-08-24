@@ -23,9 +23,9 @@ nested:
     four-sub3: sub3
 
 collection:
-  - one test
-  - two test
-  - three test
+  - one on test1
+  - two on test1
+  - three on test1
 
 collection-of-map:
   - {key: half, version: 1}

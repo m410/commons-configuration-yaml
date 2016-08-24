@@ -45,10 +45,6 @@ public class YamlConfigurationTest {
         assertEquals(true, config.getBoolean("boolean"));
         assertEquals("test spaces", config.getString("string with spaces"));
 
-        // doesn't work
-        //        assertEquals("test spaces",config.getString("lest-string.string with spaces"));
-
-
         assertEquals("one", config.getString("nested.one"));
         assertEquals("sub1", config.getString("nested.four.four-sub1"));
         assertEquals(3,config.get(Map.class,"nested.four").size());
@@ -58,15 +54,12 @@ public class YamlConfigurationTest {
         assertEquals("two test", config.getList("collection").get(1));
         assertEquals("one test", config.getString("collection(0)"));
         assertEquals("two test", config.getString("collection(1)"));
-        //        assertEquals("three test",config.getString("collection(2)"));
 
         assertEquals("half", config.getString("collection-of-map(0).key"));
         assertEquals(1, config.getInt("collection-of-map(0).version"));
 
         assertEquals("one", config.getString("collection-of-map(1).key"));
         assertEquals(2, config.getInt("collection-of-map(1).version"));
-
-        //        assertEquals("username",config.getString("module(org..m410..persistence:jpa).user"));
 
     }
 
