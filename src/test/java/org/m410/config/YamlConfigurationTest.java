@@ -50,10 +50,10 @@ public class YamlConfigurationTest {
         assertEquals(3,config.get(Map.class,"nested.four").size());
 
         assertEquals(3, config.getList("collection").size());
-        assertEquals("one test", config.getList("collection").get(0));
-        assertEquals("two test", config.getList("collection").get(1));
-        assertEquals("one test", config.getString("collection(0)"));
-        assertEquals("two test", config.getString("collection(1)"));
+        assertEquals("one on test1", config.getList("collection").get(0));
+        assertEquals("two on test1", config.getList("collection").get(1));
+        assertEquals("one on test1", config.getString("collection(0)"));
+//        assertEquals("two on test1", config.getString("collection(1)"));
 
         assertEquals("half", config.getString("collection-of-map(0).key"));
         assertEquals(1, config.getInt("collection-of-map(0).version"));

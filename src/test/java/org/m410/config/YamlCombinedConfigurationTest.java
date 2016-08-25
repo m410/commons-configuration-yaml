@@ -1,40 +1,37 @@
 package org.m410.config;
 
-import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.builder.fluent.XMLBuilderParameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.junit.Test;
 
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Michael Fortin
  */
-public class YamlCompositeConfigurationTest {
+public class YamlCombinedConfigurationTest {
 
     @Test
     public void testComposite() throws ConfigurationException {
-        final XMLBuilderParameters defaultParams = new Parameters().xml().setFileName("src/test/resource/test1.yml");
+
         final YamlConfiguration defaultConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                        .configure(defaultParams)
+                        .configure(new Parameters().hierarchical().setFileName("src/test/resource/test1.yml"))
                         .getConfiguration();
 
-        final XMLBuilderParameters overlapParams = new Parameters().xml().setFileName("src/test/resource/test2.yml");
         final YamlConfiguration overlapConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                        .configure(overlapParams)
+                        .configure(new Parameters().hierarchical().setFileName("src/test/resource/test2.yml"))
                         .getConfiguration();
 
-        CompositeConfiguration configuration = new CompositeConfiguration();
-        configuration.addConfiguration(overlapConfig);
-        configuration.addConfiguration(defaultConfig);
+        CombinedConfiguration combined = new CombinedConfiguration(new UnionCombiner());
+        // local
+        // env
+        combined.addConfiguration(overlapConfig,"app");
+        combined.addConfiguration(defaultConfig,"default");
+        YamlConfiguration configuration = new YamlConfiguration(combined);
 
         assertEquals(1222,configuration.getInt("int"));
         assertEquals(false,configuration.getBoolean("boolean"));
@@ -44,7 +41,14 @@ public class YamlCompositeConfigurationTest {
         assertEquals("one",configuration.getString("collection-of-map(0).key"));
         assertEquals("two",configuration.getString("collection-of-map(1).key"));
         assertEquals("three",configuration.getString("collection-of-map(2).key"));
+        assertEquals("four",configuration.getString("collection-of-map(3).key"));
+        assertEquals("half",configuration.getString("collection-of-map(4).key"));
 
-        assertEquals(6, configuration.getList("collection").size());
+        assertEquals("four on test2", configuration.getString("collection(0)"));
+        assertEquals("three",configuration.getString("nested.one"));
+        assertEquals("four",configuration.getString("nested.two"));
+        assertEquals("five",configuration.getString("nested.three"));
+        assertEquals("sub-three",configuration.getString("nested.four.four-sub1"));
+
     }
 }

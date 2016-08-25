@@ -1,0 +1,9 @@
+module(org.m410.persistence:jpa:1.0.0):
+#  user: username
+#  password: some-password
+#  url: jdbc:sqlserver://somehost:123/database?name=value
+  properties:
+    reconnect: true
+    query: select current_timestamp
+    size: 1
+    max: 10

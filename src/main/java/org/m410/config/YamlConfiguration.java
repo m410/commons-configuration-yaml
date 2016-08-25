@@ -3,10 +3,8 @@ package org.m410.config;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.configuration2.BaseHierarchicalConfiguration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
@@ -37,34 +35,35 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     public void read(Reader in) throws ConfigurationException, IOException {
         ImmutableNode.Builder rootBuilder = new ImmutableNode.Builder();
         ImmutableNode root = rootBuilder.create();
-        Map<ImmutableNode, ?> elemRefMap = toNodeMap(yaml.load(in));
+
+        Map<ImmutableNode, ?> elemRefMap = toNodeMap(yaml.loadAll(in).iterator().next());
         ImmutableNode top = addChildrenToRoot(root, elemRefMap);
         getSubConfigurationParentModel().mergeRoot(top, "yaml", elemRefMap, null, this);
     }
 
-    private ImmutableNode addChildrenToRoot(ImmutableNode root, Map<ImmutableNode, ?> elemRefMap) {
+    protected ImmutableNode addChildrenToRoot(ImmutableNode root, Map<ImmutableNode, ?> elemRefMap) {
         ImmutableNode top = root;
 
-        for (ImmutableNode immutableNode : elemRefMap.keySet()) {
-            if(elemRefMap.get(immutableNode) instanceof Map) {
-                top = top.addChild(addChildrenToRoot(immutableNode, (Map)elemRefMap.get(immutableNode)));
+        for (ImmutableNode node : elemRefMap.keySet()) {
+            if(elemRefMap.get(node) instanceof Map) {
+                top = top.addChild(addChildrenToRoot(node, (Map)elemRefMap.get(node)));
             }
-            else if(isNodeCollection(elemRefMap.get(immutableNode))){
-                Collection<Map<ImmutableNode, ?>> n = (Collection<Map<ImmutableNode, ?>>)elemRefMap.get(immutableNode);
+            else if(isNodeCollection(elemRefMap.get(node))){
+                Collection<Map<ImmutableNode, ?>> n = (Collection<Map<ImmutableNode, ?>>)elemRefMap.get(node);
 
-                for (Map<ImmutableNode, ?> immutableNodeMap : n) {
-                    top = top.addChild(addChildrenToRoot(immutableNode, immutableNodeMap));
+                for (Map<ImmutableNode, ?> mapValue : n) {
+                    top = top.addChild(addChildrenToRoot(node, mapValue));
                 }
             }
             else {
-                top = top.addChild(immutableNode);
+                top = top.addChild(node);
             }
         }
 
         return top;
     }
 
-    private boolean isNodeCollection(Object o) {
+    protected  boolean isNodeCollection(Object o) {
         // making some assumptions that all elements are the same
         return o instanceof Collection &&
                ((Collection)o).size() > 0 &&
@@ -75,7 +74,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         yaml.dump(fromNodeMap(getModel().getNodeHandler()), out);
     }
 
-    private Map<ImmutableNode, ?> toNodeMap(Object load) {
+    protected Map<ImmutableNode, ?> toNodeMap(Object load) {
         final Map<String,?> map = (Map<String,?>)load;
         final Map<ImmutableNode, Object> nodeMap = new HashMap<>();
 
@@ -95,12 +94,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                 if(isNodeCollection(value)) {
                     ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
                     Collection<Map<String, ?>> valueMaps = (Collection<Map<String, ?>>)value;
-                    final ArrayList<Map<ImmutableNode, ?>> maps = new ArrayList<>();
-
-                    for (Map<String, ?> body: valueMaps) {
-                        maps.add(toNodeMap(body));
-                    }
-                    nodeMap.put(currentNode, maps);
+                    nodeMap.put(currentNode, valueMaps.stream().map(vm -> toNodeMap(vm)).collect(Collectors.toList()));
                 }
                 else {
                     ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
@@ -112,11 +106,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         return nodeMap;
     }
 
-    private Object fromNodeMap(NodeHandler<ImmutableNode> nodeHandler) {
+    protected  Object fromNodeMap(NodeHandler<ImmutableNode> nodeHandler) {
         return toMap(nodeHandler);
     }
 
-    private Object toMap(NodeHandler<ImmutableNode> nodeHandler) {
+    protected  Object toMap(NodeHandler<ImmutableNode> nodeHandler) {
         final ImmutableNode node = nodeHandler.getRootNode();
         Map<String, Object> map = new HashMap<>();
 
