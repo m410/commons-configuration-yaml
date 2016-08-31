@@ -1,7 +1,5 @@
-env: development
+environment: development
 module(org.m410.persistence:jpa:1.0.0):
   user: local-user
-  password: local-password
-  url: jdbc:sqlserver://local-host:123/database?name=value
   properties:
     reconnect: false

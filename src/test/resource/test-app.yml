@@ -2,19 +2,18 @@
 module(org.m410.persistence:jpa:1.0.0):
   user: default-user
   password: default-password
-  url: jdbc:sqlserver://develop-host:123/database?name=value
+  url: jdbc:sqlserver://default-host:123/database?name=value
 
 
 ---
-env: development
+environment: development
 module(org.m410.persistence:jpa:1.0.0):
-  user: default-user
-  password: default-password
-  url: jdbc:sqlserver://develop-host:123/database?name=value
+  user: development-user
+  password: development-password
 
 
 ---
-env: test
+environment: test
 module(org.m410.persistence:jpa:1.0.0):
   user: test-user
   password: test-pass

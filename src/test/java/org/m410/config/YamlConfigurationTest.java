@@ -20,8 +20,9 @@ public class YamlConfigurationTest {
 
     @Before
     public void setUp() throws Exception {
-        final XMLBuilderParameters params = new Parameters().xml().setFileName("src/test/resource/test1.yml");
-        config = new FileBasedConfigurationBuilder<>(YamlConfiguration.class).configure(params).getConfiguration();
+        config = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                .configure(new Parameters().hierarchical().setFileName("src/test/resource/test1.yml"))
+                .getConfiguration();
     }
 
     @Test

@@ -46,7 +46,10 @@ public class YamlEnvConfiguration extends YamlConfiguration {
         for (Object object : objects) {
             Map<String, ?> configs = (Map<String, ?>) object;
 
-            if (configs.get("env") != null && configs.get("env").equals(env)) {
+            if(env.equalsIgnoreCase("default") && configs.get("environment") == null) {
+                foundConfig =  configs;
+            }
+            else if (configs.get("environment") != null && configs.get("environment").equals(env)) {
                 foundConfig =  configs;
             }
         }

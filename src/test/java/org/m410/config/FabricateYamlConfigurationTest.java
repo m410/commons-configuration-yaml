@@ -1,6 +1,7 @@
 package org.m410.config;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.ImmutableHierarchicalConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -9,13 +10,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Michael Fortin
  */
 public class FabricateYamlConfigurationTest {
     @Test
-    public void memicFabricateInitialization() throws ConfigurationException {
+    public void mimicFabricateInitialization() throws ConfigurationException {
 
         System.setProperty("fabricate.env","development");
 
@@ -50,10 +52,17 @@ public class FabricateYamlConfigurationTest {
         combined.addConfiguration(defaultConfig,"default");
 
 
-        YamlConfiguration configuration = new YamlConfiguration(combined);
+        ImmutableHierarchicalConfiguration configuration = new YamlConfiguration(combined);
 
         assertNotNull(configuration);
         assertEquals("local-user", configuration.getString("module(org..m410..persistence:jpa:1..0..0).user"));
+        assertEquals("development-password", configuration.getString("module(org..m410..persistence:jpa:1..0..0).password"));
+        assertEquals("jdbc:sqlserver://default-host:123/database?name=value", configuration.getString("module(org..m410..persistence:jpa:1..0..0).url"));
+        assertTrue(!configuration.getBoolean("module(org..m410..persistence:jpa:1..0..0).properties.reconnect"));
+        assertEquals("select current_timestamp",configuration.getString("module(org..m410..persistence:jpa:1..0..0).properties.query"));
+        assertEquals(1,configuration.getInt("module(org..m410..persistence:jpa:1..0..0).properties.size"));
+        assertEquals(10,configuration.getInt("module(org..m410..persistence:jpa:1..0..0).properties.max"));
+
         System.clearProperty("fabricate.env");
     }
 }
