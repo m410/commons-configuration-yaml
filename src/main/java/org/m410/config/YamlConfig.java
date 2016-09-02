@@ -1,14 +1,14 @@
 package org.m410.config;
 
 import org.apache.commons.configuration2.BaseHierarchicalConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ImmutableHierarchicalConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,5 +73,14 @@ public final class YamlConfig {
         System.clearProperty("fabricate.env");
 
         return envConfiguration;
+    }
+
+    public static void write(ImmutableHierarchicalConfiguration c, File file)  {
+        try(FileWriter writer = new FileWriter(file)) {
+            ((YamlConfiguration)c).write(writer);
+        }
+        catch (ConfigurationException  | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
