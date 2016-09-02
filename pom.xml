@@ -4,7 +4,7 @@
 
     <groupId>org.m410</groupId>
     <artifactId>yaml-configuration</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
     <description>
         Built on top of Snake Yaml and Apache Commons Configuration, this provides a way
@@ -26,30 +26,7 @@
     </properties>
 
     <build>
-
-        <!--<directory>${env.BUILD_HOME}/dependencies/${symbolic.name}</directory>-->
-
         <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.felix</groupId>-->
-                <!--<artifactId>maven-bundle-plugin</artifactId>-->
-                <!--<version>1.2.0</version>-->
-                <!--<configuration>-->
-                    <!--<unpackBundle>${unpack.bundle}</unpackBundle>-->
-                    <!--<instructions>-->
-                        <!--<Bundle-Name>${artifactId}</Bundle-Name>-->
-                        <!--<Bundle-SymbolicName>${symbolic.name}</Bundle-SymbolicName>-->
-                        <!--<Bundle-Description>${pom.name}</Bundle-Description>-->
-                        <!--<Import-Package>${import.packages}</Import-Package>-->
-                        <!--<Private-Package>${private.packages}</Private-Package>-->
-                        <!--<Include-Resource>${include.resources}</Include-Resource>-->
-                        <!--<Embed-Dependency>${embed-dep}</Embed-Dependency>-->
-                        <!--<_exportcontents>${export.packages}</_exportcontents>-->
-                    <!--</instructions>-->
-                <!--</configuration>-->
-                <!--<extensions>true</extensions>-->
-            <!--</plugin>-->
-
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
