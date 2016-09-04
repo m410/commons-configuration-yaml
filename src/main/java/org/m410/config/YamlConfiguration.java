@@ -11,13 +11,13 @@ import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.ImmutableNode;
+import org.apache.commons.configuration2.tree.InMemoryNodeModel;
 import org.apache.commons.configuration2.tree.NodeHandler;
 import org.apache.commons.configuration2.tree.NodeModel;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 public class YamlConfiguration extends BaseHierarchicalConfiguration implements FileBasedConfiguration {
-
-    private final Yaml yaml = new Yaml();
 
     public YamlConfiguration() {
         super();
@@ -33,6 +33,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
 
 
     public void read(Reader in) throws ConfigurationException, IOException {
+        Yaml yaml = new Yaml();
         ImmutableNode.Builder rootBuilder = new ImmutableNode.Builder();
         ImmutableNode root = rootBuilder.create();
 
@@ -71,7 +72,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     }
 
     public void write(Writer out) throws ConfigurationException, IOException {
-        yaml.dump(fromNodeMap(getModel().getNodeHandler()), out);
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(options);
+        final InMemoryNodeModel nodeModel = this.getNodeModel();
+        yaml.dump(fromNodeMap(getModel().getInMemoryRepresentation()), out);
     }
 
     protected Map<ImmutableNode, ?> toNodeMap(Object load) {
@@ -106,16 +111,55 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         return nodeMap;
     }
 
-    protected  Object fromNodeMap(NodeHandler<ImmutableNode> nodeHandler) {
-        return toMap(nodeHandler);
+    protected  Map<String, Object> fromNodeMap(ImmutableNode node) {
+        return toMap(new HashMap<>(), node);
     }
 
-    protected  Object toMap(NodeHandler<ImmutableNode> nodeHandler) {
-        final ImmutableNode node = nodeHandler.getRootNode();
-        Map<String, Object> map = new HashMap<>();
+    protected  Map<String, Object> toMap(Map<String, Object> map, ImmutableNode node) {
 
         for (ImmutableNode immutableNode : node.getChildren()) {
-            map.put(immutableNode.getNodeName(),immutableNode.getValue());
+            final Object value = immutableNode.getValue();
+            final String name = immutableNode.getNodeName();
+
+            if(map.containsKey(name)) {
+                if(value instanceof Map) {
+                    ((Map<String,Object>)map.get(name)).putAll((Map)value);
+                }
+                else if (value instanceof Collection){
+
+                    if(isNodeCollection(value)) {
+                        Collection<Map<String, Object>> valueMaps = (Collection<Map<String, Object>>)value;
+                        List<Map<String, Object>> collect = valueMaps.stream()
+                                .map(vm -> toMap(vm, immutableNode))
+                                .collect(Collectors.toList());
+                        ((Collection<Map<String, Object>>)map.get(name)).addAll(collect);
+                    }
+                    else {
+                        ((Collection)map.get(name)).addAll((Collection)value);
+                    }
+                }
+            }
+            else {
+                if(value instanceof String || value instanceof Number || value instanceof Boolean) {
+                    map.put(name,immutableNode.getValue());
+                }
+                else if(value instanceof Map) {
+                    map.put(name,value);
+                }
+                else if (value instanceof Collection){
+
+                    if(isNodeCollection(value)) {
+                        Collection<Map<String, Object>> valueMaps = (Collection<Map<String, Object>>)value;
+                        List<Map<String, Object>> collect = valueMaps.stream()
+                                .map(vm -> toMap(vm, immutableNode))
+                                .collect(Collectors.toList());
+                        map.put(name, collect);
+                    }
+                    else {
+                        map.put(name,value);
+                    }
+                }
+            }
         }
 
         return map;

@@ -6,9 +6,15 @@ import org.apache.commons.configuration2.builder.fluent.XMLBuilderParameters;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -21,7 +27,7 @@ public class YamlConfigurationTest {
     @Before
     public void setUp() throws Exception {
         config = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                .configure(new Parameters().hierarchical().setFileName("src/test/resource/test1.yml"))
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/test1.yml"))
                 .getConfiguration();
     }
 

@@ -4,9 +4,14 @@ import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.MergeCombiner;
 import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.junit.Test;
 
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,19 +21,45 @@ import static org.junit.Assert.assertEquals;
 public class YamlCombinedConfigurationTest {
 
     @Test
+    public void mergeDependencies() throws ConfigurationException, IOException {
+        CombinedConfiguration combined = new CombinedConfiguration(new UnionCombiner());
+        final YamlConfiguration first = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps1.yml"))
+                .getConfiguration();
+
+        final YamlConfiguration second = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps2.yml"))
+                .getConfiguration();
+
+        combined.addConfiguration(second);
+        combined.addConfiguration(first);
+
+        YamlConfiguration configuration = new YamlConfiguration(combined);
+
+        assertEquals(5, configuration.getMaxIndex("dependencies"));
+
+//        StringWriter writer = new StringWriter();
+//        configuration.write(writer);
+//        writer.close();
+//        final String output = writer.toString();
+//        System.out.println("---");
+//        System.out.println(output);
+//        System.out.println("---");
+//        assertEquals(6, (output.length() - output.replace("- ", "").length())/2);
+    }
+
+    @Test
     public void testComposite() throws ConfigurationException {
 
         final YamlConfiguration defaultConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                        .configure(new Parameters().hierarchical().setFileName("src/test/resource/test1.yml"))
+                        .configure(new Parameters().hierarchical().setFileName("src/test/resources/test1.yml"))
                         .getConfiguration();
 
         final YamlConfiguration overlapConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                        .configure(new Parameters().hierarchical().setFileName("src/test/resource/test2.yml"))
+                        .configure(new Parameters().hierarchical().setFileName("src/test/resources/test2.yml"))
                         .getConfiguration();
 
         CombinedConfiguration combined = new CombinedConfiguration(new UnionCombiner());
-        // local
-        // env
         combined.addConfiguration(overlapConfig,"app");
         combined.addConfiguration(defaultConfig,"default");
         YamlConfiguration configuration = new YamlConfiguration(combined);

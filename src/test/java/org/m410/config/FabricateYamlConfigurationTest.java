@@ -25,20 +25,19 @@ public class FabricateYamlConfigurationTest {
 
         // local-env
         final YamlConfiguration localConfig = new FileBasedConfigurationBuilder<>(YamlEnvConfiguration.class)
-                .configure(new Parameters().hierarchical().setFileName("src/test/resource/test-local.yml"))
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/test-local.yml"))
                 .getConfiguration();
         combined.addConfiguration(localConfig,"local");
 
         // app-env
         final YamlConfiguration envConfig = new FileBasedConfigurationBuilder<>(YamlEnvConfiguration.class)
-                .configure(new Parameters().hierarchical().setFileName("src/test/resource/test-app.yml"))
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/test-app.yml"))
                 .getConfiguration();
         combined.addConfiguration(envConfig,"env");
 
-
         // app
         final YamlConfiguration overlapConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                .configure(new Parameters().hierarchical().setFileName("src/test/resource/test-app.yml"))
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/test-app.yml"))
                 .getConfiguration();
         combined.addConfiguration(overlapConfig,"app");
 
@@ -47,7 +46,7 @@ public class FabricateYamlConfigurationTest {
 
         // default
         final YamlConfiguration defaultConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
-                .configure(new Parameters().hierarchical().setFileName("src/test/resource/test-default.yml"))
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/test-default.yml"))
                 .getConfiguration();
         combined.addConfiguration(defaultConfig,"default");
 

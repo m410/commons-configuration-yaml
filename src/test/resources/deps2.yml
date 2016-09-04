@@ -1,0 +1,3 @@
+dependencies:
+  - {scope: compile, org: org.apache, name: commons-lang, rev: 1.0.0}
+  - {scope: compile, org: org.apache, name: commons-util, rev: 1.0.0}
