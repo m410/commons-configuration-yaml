@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class YamlCombinedConfigurationTest {
 
     @Test
-    public void mergeDependencies() throws ConfigurationException, IOException {
+    public void writeMerged() throws ConfigurationException, IOException {
         CombinedConfiguration combined = new CombinedConfiguration(new UnionCombiner());
         final YamlConfiguration first = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps1.yml"))
@@ -36,16 +36,19 @@ public class YamlCombinedConfigurationTest {
 
         YamlConfiguration configuration = new YamlConfiguration(combined);
 
-        assertEquals(5, configuration.getMaxIndex("dependencies"));
+        assertEquals(2, configuration.getMaxIndex("dependencies"));
+        assertEquals("commons-lang", configuration.getString("dependencies(0).name"));
+        assertEquals("h2", configuration.getString("dependencies(1).name"));
+        assertEquals("slf4j-api", configuration.getString("dependencies(2).name"));
 
-//        StringWriter writer = new StringWriter();
-//        configuration.write(writer);
-//        writer.close();
-//        final String output = writer.toString();
-//        System.out.println("---");
-//        System.out.println(output);
-//        System.out.println("---");
-//        assertEquals(6, (output.length() - output.replace("- ", "").length())/2);
+        StringWriter writer = new StringWriter();
+        configuration.write(writer);
+        writer.close();
+        final String output = writer.toString();
+        System.out.println("---");
+        System.out.println(output);
+        System.out.println("---");
+        assertEquals(3, (output.length() - output.replace("- ", "").length())/2);
     }
 
     @Test

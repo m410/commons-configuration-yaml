@@ -11,8 +11,6 @@ import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.ImmutableNode;
-import org.apache.commons.configuration2.tree.InMemoryNodeModel;
-import org.apache.commons.configuration2.tree.NodeHandler;
 import org.apache.commons.configuration2.tree.NodeModel;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -75,8 +73,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         Yaml yaml = new Yaml(options);
-        final InMemoryNodeModel nodeModel = this.getNodeModel();
-        yaml.dump(fromNodeMap(getModel().getInMemoryRepresentation()), out);
+        yaml.dump(fromNode(this.getModel().getNodeHandler().getRootNode()), out);
     }
 
     protected Map<ImmutableNode, ?> toNodeMap(Object load) {
@@ -111,11 +108,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         return nodeMap;
     }
 
-    protected  Map<String, Object> fromNodeMap(ImmutableNode node) {
-        return toMap(new HashMap<>(), node);
+    protected  Map<String, Object> fromNode(ImmutableNode node) {
+        return fromNodeMap(new HashMap<>(), node);
     }
 
-    protected  Map<String, Object> toMap(Map<String, Object> map, ImmutableNode node) {
+    protected  Map<String, Object> fromNodeMap(Map<String, Object> map, ImmutableNode node) {
 
         for (ImmutableNode immutableNode : node.getChildren()) {
             final Object value = immutableNode.getValue();
@@ -130,7 +127,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                     if(isNodeCollection(value)) {
                         Collection<Map<String, Object>> valueMaps = (Collection<Map<String, Object>>)value;
                         List<Map<String, Object>> collect = valueMaps.stream()
-                                .map(vm -> toMap(vm, immutableNode))
+                                .map(vm -> fromNodeMap(vm, immutableNode))
                                 .collect(Collectors.toList());
                         ((Collection<Map<String, Object>>)map.get(name)).addAll(collect);
                     }
@@ -151,7 +148,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                     if(isNodeCollection(value)) {
                         Collection<Map<String, Object>> valueMaps = (Collection<Map<String, Object>>)value;
                         List<Map<String, Object>> collect = valueMaps.stream()
-                                .map(vm -> toMap(vm, immutableNode))
+                                .map(vm -> fromNodeMap(vm, immutableNode))
                                 .collect(Collectors.toList());
                         map.put(name, collect);
                     }
