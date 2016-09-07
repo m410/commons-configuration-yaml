@@ -25,7 +25,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         super(c);
     }
 
-    protected YamlConfiguration(NodeModel<ImmutableNode> model) {
+    public YamlConfiguration(NodeModel<ImmutableNode> model) {
         super(model);
     }
 
@@ -62,7 +62,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         return top;
     }
 
-    protected  static boolean isNodeCollection(Object o) {
+    private static boolean isNodeCollection(Object o) {
         // making some assumptions that all elements are the same
         return o instanceof Collection &&
                ((Collection)o).size() > 0 &&
@@ -115,11 +115,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     }
 
 
-    static final class YamlBuilder extends BuilderVisitor {
+    private static final class YamlBuilder extends BuilderVisitor {
         Map<String, Object> document = new HashMap<>();
         List<Shadow> documentShadow = new ArrayList<>();
 
-        protected YamlBuilder() {
+        YamlBuilder() {
             super();
             documentShadow.add(new ShadowMapNode("yaml","yaml",null));
         }
@@ -130,18 +130,30 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                 final ReferenceNodeHandler handler) {
 
             final String nodeName = node.getNodeName();
-            final String longNodeName = toLongName(handler.getParent(node), handler, node.getNodeName().replaceAll("\\.", "\\^"));
+            final String nodeNameEscaped = node.getNodeName().replaceAll("\\.", "\\^");
+            final String longNodeName = toLongName(parent, handler, nodeNameEscaped);
             final Object value = node.getValue();
 
             Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName, value));
-
             shadow.syncDocument(value);
         }
 
-        YamlConfiguration.YamlBuilder.Shadow makeShadow(ImmutableNode parent, ReferenceNodeHandler handler,
+        @Override
+        protected void update(ImmutableNode node, Object value, ReferenceNodeHandler handler) {
+            final ImmutableNode parent = handler.getParent(node);
+            final String nodeName = node.getNodeName();
+            final String nodeNameEscaped = node.getNodeName().replaceAll("\\.", "\\^");
+            final String longNodeName = toLongName(parent, handler, nodeNameEscaped);
+
+            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName, value));
+            shadow.syncDocument(value);
+        }
+
+
+        Shadow makeShadow(ImmutableNode parent, ReferenceNodeHandler handler,
                 String nodeName, String longNodeName, Object value) {
-            YamlConfiguration.YamlBuilder.Shadow shadowParent = by(longNodeName.substring(0, longNodeName.lastIndexOf("."))).orElse(null);
-            YamlConfiguration.YamlBuilder.Shadow newShadow = null;
+            Shadow shadowParent = by(longNodeName.substring(0, longNodeName.lastIndexOf("."))).orElse(null);
+            Shadow newShadow = null;
 
             if (value instanceof String || value instanceof Number || value instanceof Boolean) {
                 newShadow = shadowLeaf(longNodeName, nodeName, shadowParent);
@@ -163,15 +175,12 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
 
         String toLongName(ImmutableNode node, ReferenceNodeHandler handler, String init) {
             if(node != null) {
-                return toLongName(handler.getParent(node), handler, node.getNodeName().replaceAll("\\.","\\^") +"."+ init);
+                final String nodePath = node.getNodeName().replaceAll("\\.", "\\^") + "." + init;
+                return toLongName(handler.getParent(node), handler, nodePath);
             }
             else {
                 return init;
             }
-        }
-
-        @Override
-        protected void update(ImmutableNode immutableNode, Object o, ReferenceNodeHandler referenceNodeHandler) {
         }
 
         Map<String, Object> getDocument() {
@@ -239,7 +248,6 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         }
 
         class ShadowMapNode extends Shadow<Map<String,Object>> {
-            private int pointer = 0;
 
             ShadowMapNode(String longName, String name, Shadow parent) {
                 super(longName, name,parent);

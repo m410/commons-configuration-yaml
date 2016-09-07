@@ -45,14 +45,11 @@ public class YamlCombinedConfigurationTest {
         configuration.write(writer);
         writer.close();
         final String output = writer.toString();
-//        System.out.println("---");
-//        System.out.println(output);
-//        System.out.println("---");
         assertEquals(6, (output.length() - output.replace("- ", "").length()) / 2);
     }
 
     @Test
-    public void testComposite() throws ConfigurationException {
+    public void testComposite() throws ConfigurationException, IOException {
 
         final YamlConfiguration defaultConfig = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFileName("src/test/resources/test1.yml"))
@@ -84,5 +81,10 @@ public class YamlCombinedConfigurationTest {
         assertEquals("five", configuration.getString("nested.three"));
         assertEquals("sub-three", configuration.getString("nested.four.four-sub1"));
 
+        StringWriter writer = new StringWriter();
+        configuration.write(writer);
+        writer.close();
+        final String output = writer.toString();
+        assertEquals(11, (output.length() - output.replace("- ", "").length()) / 2);
     }
 }
