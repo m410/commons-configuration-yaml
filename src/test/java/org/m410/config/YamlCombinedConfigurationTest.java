@@ -33,19 +33,22 @@ public class YamlCombinedConfigurationTest {
 
         YamlConfiguration configuration = new YamlConfiguration(combined);
 
-        assertEquals(2, configuration.getMaxIndex("dependencies"));
+        assertEquals(5, configuration.getMaxIndex("dependencies"));
         assertEquals("commons-lang", configuration.getString("dependencies(0).name"));
-        assertEquals("h2", configuration.getString("dependencies(1).name"));
-        assertEquals("slf4j-api", configuration.getString("dependencies(2).name"));
+        assertEquals("commons-util", configuration.getString("dependencies(1).name"));
+        assertEquals("h2", configuration.getString("dependencies(2).name"));
+        assertEquals("hibernate-entitymanager", configuration.getString("dependencies(3).name"));
+        assertEquals("hibernate-validator", configuration.getString("dependencies(4).name"));
+        assertEquals("slf4j-api", configuration.getString("dependencies(5).name"));
 
         StringWriter writer = new StringWriter();
         configuration.write(writer);
         writer.close();
         final String output = writer.toString();
-        System.out.println("---");
-        System.out.println(output);
-        System.out.println("---");
-        assertEquals(3, (output.length() - output.replace("- ", "").length()) / 2);
+//        System.out.println("---");
+//        System.out.println(output);
+//        System.out.println("---");
+        assertEquals(6, (output.length() - output.replace("- ", "").length()) / 2);
     }
 
     @Test
