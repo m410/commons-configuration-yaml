@@ -75,7 +75,7 @@ public class YamlConfigurationTest {
         final StringWriter file = new StringWriter();
         config.write(file);
         String out = file.toString();
-        System.out.println(out);
+//        System.out.println(out);
         assertTrue(out.contains("int: 12"));
     }
 }
