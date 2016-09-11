@@ -1,19 +1,22 @@
 package org.m410.config;
 
+import org.apache.commons.configuration2.BaseHierarchicalConfiguration;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
+import org.apache.commons.configuration2.tree.NodeModel;
+import org.apache.commons.configuration2.tree.NodeTreeWalker;
+import org.apache.commons.configuration2.tree.ReferenceNodeHandler;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.commons.configuration2.BaseHierarchicalConfiguration;
-import org.apache.commons.configuration2.FileBasedConfiguration;
-import org.apache.commons.configuration2.HierarchicalConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.configuration2.tree.*;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
 public class YamlConfiguration extends BaseHierarchicalConfiguration implements FileBasedConfiguration {
 
@@ -72,8 +75,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     public void write(Writer out) throws ConfigurationException, IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml = new Yaml(options);
-        yaml.dump(fromNode(), out);
+        new Yaml(options).dump(fromNode(), out);
     }
 
     private Map<String, Object> fromNode() {

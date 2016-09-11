@@ -1,0 +1,49 @@
+archetype: {name: garden, version: 0.2-SNAPSHOT, organization: org.m410.fabricate}
+application: {name: demo2, organization: org.m410.demo, version: 1.0-SNAPSHOT, packageName: org.m410,
+  applicationClass: org.m410.angular.web.MyApplication, author: Michael Fortin, description: My Demo App}
+persistence(org.m410.garden:garden-jpa:0.2-SNAPSHOT):
+  remote_reference: file:../../garden/garden-jpa/src/main/resources/garden-jpa.fab.yml
+  user_orm_builder: true
+  properties: {hibernate.dialect: org.hibernate.dialect.H2Dialect, hibernate.connection.driver_class: org.h2.Driver,
+    hibernate.connection.username: sa, hibernate.connection.password: '', hibernate.connection.url: 'jdbc:h2:~/Documents/demo-angular;AUTO_SERVER=TRUE',
+    hibernate.hbm2ddl.auto: update}
+repositories:
+- {id: m410, url: 'http://repo.m410.org'}
+build: {defaultEnvironment: development, defaultCommand: make, lang: java, langVersion: '1.8',
+  compilerArgs: -ea, targetDir: target, webappDir: webapp, sourceDir: src/java, sourceOutputDir: target/classes,
+  resourceDir: src/resources, testDir: test/java, testOutputDir: target/test-classes,
+  testResourceDir: test/resources, packageSource: false, packageDocs: false, packageName: null}
+bundles:
+- {name: fab-share, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-share/target/fab-share-0.2-SNAPSHOT.jar'}
+- {name: fab-java-garden-project, org: org.m410.fabricate, version: 0.2-SNAPSHOT,
+  remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-garden-project/target/garden-0.2-SNAPSHOT.jar'}
+- {name: fab-war, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-war/target/fab-war-0.2-SNAPSHOT.jar'}
+- {name: fab-junit, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-junit/target/fab-junit-0.2-SNAPSHOT.jar'}
+- {name: fab-java-compiler, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-compiler/target/fab-java-compiler-0.2-SNAPSHOT.jar'}
+- {name: fab-dependencies, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-dependencies/target/fab-java-dependencies-0.2-SNAPSHOT.jar'}
+modules(org.m410.garden:garden-jetty9:0.2-SNAPSHOT): {remote_reference: 'file:../../garden/garden-jetty9/src/main/resources/garden-jetty9.fab.yml'}
+modules(org.m410.garden:garden-jpa:0.2-SNAPSHOT):
+  properties: {hibernate.dialect: org.hibernate.dialect.H2Dialect, hibernate.connection.driver_class: org.h2.Driver,
+    hibernate.connection.username: sa, hibernate.connection.password: '', hibernate.connection.url: 'jdbc:h2:db/demo;AUTO_SERVER=TRUE',
+    hibernate.hbm2ddl.auto: update}
+logging(org.m410.garden:garden-logback:0.2-SNAPSHOT):
+  appenders:
+  - {name: STDOUT, appender class: ch.qos.logback.core.ConsoleAppender, layout: ch.qos.logback.classic.encoder.PatternLayoutEncoder,
+    pattern: '%-4relative [%thread] %-5level %class - %msg%n'}
+  logger:
+  - {name: org.m410, level: TRACE}
+  root:
+    level: DEBUG
+    ref: [STDOUT]
+dependencies:
+- {scope: compile, org: org.m410.garden, name: garden, rev: 0.2.0-SNAPSHOT}
+- {scope: compile, org: com.google.code.gson, name: gson, rev: 2.2.4}
+- {scope: compile, org: org.slf4j, name: slf4j-api, rev: 1.7.7}
+- {scope: compile, org: org.yaml, name: snakeyaml, rev: '1.13'}
+- {scope: compile, org: com.google.guava, name: guava, rev: '18.0'}
+- {scope: compile, org: com.fasterxml, name: classmate, rev: 1.1.0}
+- {scope: provided, org: org.glassfish.web, name: javax.el, rev: 2.2.6}
+- {scope: provided, org: javax.el, name: el-api, rev: 2.2.1-b04}
+- {scope: provided, org: javax.servlet, name: javax.servlet-api, rev: 3.1.0}
+
+
