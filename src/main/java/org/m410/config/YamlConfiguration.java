@@ -223,11 +223,6 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             void syncDocument(Object value) {
                 if (this.parent instanceof ShadowCollectionNode) {
                     final ShadowCollectionNode parent = (ShadowCollectionNode) this.parent;
-                    //                    // todo remove debugging
-                    //                    System.out.println(parent);
-                    //                    System.out.println("size:"+ parent.reference.size() +", pnt:"+ pointer + ",
-                    // "+parent.reference);
-                    //                    System.out.println("value:" + value);
 
                     if (parent.reference.size() <= pointer) {
                         parent.reference.add(pointer, new HashMap<>());
