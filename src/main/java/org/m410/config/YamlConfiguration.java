@@ -118,7 +118,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
 
 
     private static final class YamlBuilder extends BuilderVisitor {
-        Map<String, Object> document = new HashMap<>();
+        Map<String, Object> document = new TreeMap<>();
         List<Shadow> documentShadow = new ArrayList<>();
 
         YamlBuilder() {
@@ -225,7 +225,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                     final ShadowCollectionNode parent = (ShadowCollectionNode) this.parent;
 
                     if (parent.reference.size() <= pointer) {
-                        parent.reference.add(pointer, new HashMap<>());
+                        parent.reference.add(pointer, new TreeMap<>());
                     }
 
                     parent.reference.get(pointer).put(name, value);
@@ -250,7 +250,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             ShadowCollectionNode(String longName, String name, int size, Shadow parent) {
                 super(longName, name, parent);
                 this.reference = new ArrayList<>();
-                IntStream.range(0, size).forEach(i -> this.reference.add(new HashMap<>()));
+                IntStream.range(0, size).forEach(i -> this.reference.add(new TreeMap<>()));
 
                 if (parent instanceof ShadowMapNode) {
                     ((ShadowMapNode) parent).reference.put(name, this.reference);
@@ -277,11 +277,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                     this.reference = document;
                 }
                 else if (parent instanceof ShadowMapNode) {
-                    this.reference = new HashMap<>();
+                    this.reference = new TreeMap<>();
                     ((ShadowMapNode) parent).reference.put(name, reference);
                 }
                 else if (parent instanceof ShadowCollectionNode) {
-                    this.reference = new HashMap<>();
+                    this.reference = new TreeMap<>();
                     ((ShadowCollectionNode) parent).reference.get(pointer).put(name, this.reference);
                 }
             }
