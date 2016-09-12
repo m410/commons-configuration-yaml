@@ -18,4 +18,5 @@ public class YamlConfiguration2Test {
                 .getConfiguration();
         assertNotNull(configuration);
     }
+
 }

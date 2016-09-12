@@ -45,6 +45,7 @@ public class YamlCombinedConfigurationTest {
         configuration.write(writer);
         writer.close();
         final String output = writer.toString();
+        //        System.out.println(output);
         assertEquals(6, (output.length() - output.replace("- ", "").length()) / 2);
     }
 
@@ -85,6 +86,7 @@ public class YamlCombinedConfigurationTest {
         configuration.write(writer);
         writer.close();
         final String output = writer.toString();
+        System.out.println(output);
         assertEquals(11, (output.length() - output.replace("- ", "").length()) / 2);
     }
 }

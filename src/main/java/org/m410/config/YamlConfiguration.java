@@ -47,11 +47,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         ImmutableNode top = root;
 
         for (ImmutableNode node : elemRefMap.keySet()) {
-            if(elemRefMap.get(node) instanceof Map) {
-                top = top.addChild(addChildrenToRoot(node, (Map)elemRefMap.get(node)));
+            if (elemRefMap.get(node) instanceof Map) {
+                top = top.addChild(addChildrenToRoot(node, (Map) elemRefMap.get(node)));
             }
-            else if(isNodeCollection(elemRefMap.get(node))){
-                Collection<Map<ImmutableNode, ?>> n = (Collection<Map<ImmutableNode, ?>>)elemRefMap.get(node);
+            else if (isNodeCollection(elemRefMap.get(node))) {
+                Collection<Map<ImmutableNode, ?>> n = (Collection<Map<ImmutableNode, ?>>) elemRefMap.get(node);
 
                 for (Map<ImmutableNode, ?> mapValue : n) {
                     top = top.addChild(addChildrenToRoot(node, mapValue));
@@ -68,8 +68,8 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     private static boolean isNodeCollection(Object o) {
         // making some assumptions that all elements are the same
         return o instanceof Collection &&
-               ((Collection)o).size() > 0 &&
-               ((Collection)o).iterator().next() instanceof Map;
+               ((Collection) o).size() > 0 &&
+               ((Collection) o).iterator().next() instanceof Map;
     }
 
     public void write(Writer out) throws ConfigurationException, IOException {
@@ -80,30 +80,30 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
 
     private Map<String, Object> fromNode() {
         final YamlBuilder visitor = new YamlBuilder();
-        NodeTreeWalker.INSTANCE.walkBFS(getNodeModel().getRootNode(), visitor,getNodeModel().getNodeHandler());
+        NodeTreeWalker.INSTANCE.walkBFS(getNodeModel().getRootNode(), visitor, getNodeModel().getNodeHandler());
         return visitor.getDocument();
     }
 
     protected Map<ImmutableNode, ?> toNodeMap(Object load) {
-        final Map<String,?> map = (Map<String,?>)load;
+        final Map<String, ?> map = (Map<String, ?>) load;
         final Map<ImmutableNode, Object> nodeMap = new HashMap<>();
 
         for (String key : map.keySet()) {
             Object value = map.get(key);
 
-            if(value instanceof String || value instanceof Number || value instanceof Boolean) {
+            if (value instanceof String || value instanceof Number || value instanceof Boolean) {
                 ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
                 nodeMap.put(currentNode, value);
             }
-            else if(value instanceof Map) {
+            else if (value instanceof Map) {
                 ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
                 nodeMap.put(currentNode, toNodeMap(value));
             }
-            else if (value instanceof Collection){
+            else if (value instanceof Collection) {
 
-                if(isNodeCollection(value)) {
+                if (isNodeCollection(value)) {
                     ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
-                    Collection<Map<String, ?>> valueMaps = (Collection<Map<String, ?>>)value;
+                    Collection<Map<String, ?>> valueMaps = (Collection<Map<String, ?>>) value;
                     nodeMap.put(currentNode, valueMaps.stream().map(vm -> toNodeMap(vm)).collect(Collectors.toList()));
                 }
                 else {
@@ -123,7 +123,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
 
         YamlBuilder() {
             super();
-            documentShadow.add(new ShadowMapNode("yaml","yaml",null));
+            documentShadow.add(new ShadowMapNode("yaml", "yaml", null));
         }
 
         @Override
@@ -136,7 +136,8 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             final String longNodeName = toLongName(parent, handler, nodeNameEscaped);
             final Object value = node.getValue();
 
-            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName, value));
+            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName,
+                    value));
             shadow.syncDocument(value);
         }
 
@@ -147,10 +148,10 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             final String nodeNameEscaped = node.getNodeName().replaceAll("\\.", "\\^");
             final String longNodeName = toLongName(parent, handler, nodeNameEscaped);
 
-            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName, value));
+            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName,
+                    value));
             shadow.syncDocument(value);
         }
-
 
         Shadow makeShadow(ImmutableNode parent, ReferenceNodeHandler handler,
                 String nodeName, String longNodeName, Object value) {
@@ -176,7 +177,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         }
 
         String toLongName(ImmutableNode node, ReferenceNodeHandler handler, String init) {
-            if(node != null) {
+            if (node != null) {
                 final String nodePath = node.getNodeName().replaceAll("\\.", "\\^") + "." + init;
                 return toLongName(handler.getParent(node), handler, nodePath);
             }
@@ -190,22 +191,22 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         }
 
         Optional<Shadow> by(String longName) {
-            return documentShadow.stream().filter(s->s.longName.equals(longName)).findFirst();
+            return documentShadow.stream().filter(s -> s.longName.equals(longName)).findFirst();
         }
 
         Shadow shadowMap(String longName, String name, Shadow parent) {
-            return new ShadowMapNode(longName, name,parent);
+            return new ShadowMapNode(longName, name, parent);
         }
 
         Shadow shadowLeaf(String longName, String name, Shadow parent) {
-            return new ShadowLeafNode(longName, name,parent);
+            return new ShadowLeafNode(longName, name, parent);
         }
 
         Shadow shadowCollection(String longName, String name, int size, Shadow parent) {
-            return new ShadowCollectionNode(longName, name,size,parent);
+            return new ShadowCollectionNode(longName, name, size, parent);
         }
 
-        abstract class Shadow<T>{
+        abstract class Shadow<T> {
             String name;
             String longName;
             Shadow parent;
@@ -220,26 +221,44 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             }
 
             void syncDocument(Object value) {
-                if(this.parent instanceof ShadowCollectionNode){
-                    ((ShadowCollectionNode)parent).reference.get(pointer).put(name,value);
+                if (this.parent instanceof ShadowCollectionNode) {
+                    final ShadowCollectionNode parent = (ShadowCollectionNode) this.parent;
+                    //                    // todo remove debugging
+                    //                    System.out.println(parent);
+                    //                    System.out.println("size:"+ parent.reference.size() +", pnt:"+ pointer + ",
+                    // "+parent.reference);
+                    //                    System.out.println("value:" + value);
+
+                    if (parent.reference.size() <= pointer) {
+                        parent.reference.add(pointer, new HashMap<>());
+                    }
+
+                    parent.reference.get(pointer).put(name, value);
                     pointer++;
                 }
                 else {
-                    ShadowMapNode parentMap = (ShadowMapNode)this.parent;
-                    parentMap.reference.put(name,value);
+                    ShadowMapNode parentMap = (ShadowMapNode) this.parent;
+                    parentMap.reference.put(name, value);
                 }
+            }
+
+            @Override
+            public String toString() {
+                return "Shadow{" +
+                       "longName='" + longName + '\'' +
+                       '}';
             }
         }
 
-        class ShadowCollectionNode extends Shadow<List<Map<String,Object>>> {
+        class ShadowCollectionNode extends Shadow<List<Map<String, Object>>> {
 
             ShadowCollectionNode(String longName, String name, int size, Shadow parent) {
-                super(longName, name,parent);
+                super(longName, name, parent);
                 this.reference = new ArrayList<>();
-                IntStream.range(0,size).forEach(i->this.reference.add(new HashMap<>()));
+                IntStream.range(0, size).forEach(i -> this.reference.add(new HashMap<>()));
 
-                if(parent instanceof ShadowMapNode) {
-                    ((ShadowMapNode)parent).reference.put(name, this.reference);
+                if (parent instanceof ShadowMapNode) {
+                    ((ShadowMapNode) parent).reference.put(name, this.reference);
                 }
             }
 
@@ -247,32 +266,48 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             void syncDocument(Object value) {
                 // do nothing
             }
+
+            @Override
+            public String toString() {
+                return "Collection" + super.toString();
+            }
         }
 
-        class ShadowMapNode extends Shadow<Map<String,Object>> {
+        class ShadowMapNode extends Shadow<Map<String, Object>> {
 
             ShadowMapNode(String longName, String name, Shadow parent) {
-                super(longName, name,parent);
+                super(longName, name, parent);
 
-                if(parent == null){
+                if (parent == null) {
                     this.reference = document;
                 }
-                else if(parent instanceof ShadowMapNode) {
+                else if (parent instanceof ShadowMapNode) {
                     this.reference = new HashMap<>();
-                    ((ShadowMapNode)parent).reference.put(name,reference);
+                    ((ShadowMapNode) parent).reference.put(name, reference);
                 }
-                else if(parent instanceof ShadowCollectionNode) {
+                else if (parent instanceof ShadowCollectionNode) {
                     this.reference = new HashMap<>();
-                    ((ShadowCollectionNode)parent).reference.get(pointer).put(name,this.reference);
+                    ((ShadowCollectionNode) parent).reference.get(pointer).put(name, this.reference);
                 }
+            }
+
+            @Override
+            public String toString() {
+                return "Map" + super.toString();
             }
         }
 
         class ShadowLeafNode extends Shadow<Object> {
 
             ShadowLeafNode(String longName, String name, Shadow parent) {
-                super(longName, name,parent);
+                super(longName, name, parent);
+            }
+
+            @Override
+            public String toString() {
+                return "Leaf" + super.toString();
             }
         }
+
     }
 }
