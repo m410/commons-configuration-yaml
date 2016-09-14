@@ -1,0 +1,4 @@
+
+dependencies:
+- { scope: test, org: org.hamcrest, name: hamcrest-core, rev: "1.3"}
+- { scope: test, org: junit, name: junit, rev: "4.11"}

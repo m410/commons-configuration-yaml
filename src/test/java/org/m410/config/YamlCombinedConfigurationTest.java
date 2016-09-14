@@ -23,30 +23,42 @@ public class YamlCombinedConfigurationTest {
         final YamlConfiguration first = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps1.yml"))
                 .getConfiguration();
+        combined.addConfiguration(first);
 
         final YamlConfiguration second = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps2.yml"))
                 .getConfiguration();
-
         combined.addConfiguration(second);
-        combined.addConfiguration(first);
+
+        final YamlConfiguration third = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps3.yml"))
+                .getConfiguration();
+        combined.addConfiguration(third);
+
+        final YamlConfiguration fourth = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
+                .configure(new Parameters().hierarchical().setFileName("src/test/resources/deps4.yml"))
+                .getConfiguration();
+        combined.addConfiguration(fourth);
 
         YamlConfiguration configuration = new YamlConfiguration(combined);
+        String output = null;
 
-        assertEquals(5, configuration.getMaxIndex("dependencies"));
-        assertEquals("commons-lang", configuration.getString("dependencies(0).name"));
-        assertEquals("commons-util", configuration.getString("dependencies(1).name"));
-        assertEquals("h2", configuration.getString("dependencies(2).name"));
-        assertEquals("hibernate-entitymanager", configuration.getString("dependencies(3).name"));
-        assertEquals("hibernate-validator", configuration.getString("dependencies(4).name"));
-        assertEquals("slf4j-api", configuration.getString("dependencies(5).name"));
+        try (StringWriter writer = new StringWriter()) {
+            configuration.write(writer);
+            output = writer.toString();
+            System.out.println(output);
+        }
 
-        StringWriter writer = new StringWriter();
-        configuration.write(writer);
-        writer.close();
-        final String output = writer.toString();
-        //        System.out.println(output);
-        assertEquals(6, (output.length() - output.replace("- ", "").length()) / 2);
+        assertEquals(16, configuration.getMaxIndex("dependencies"));
+        //        assertEquals("commons-lang", configuration.getString("dependencies(0).name"));
+        //        assertEquals("commons-util", configuration.getString("dependencies(1).name"));
+        //        assertEquals("h2", configuration.getString("dependencies(2).name"));
+        //        assertEquals("hibernate-entitymanager", configuration.getString("dependencies(3).name"));
+        //        assertEquals("hibernate-validator", configuration.getString("dependencies(4).name"));
+        //        assertEquals("slf4j-api", configuration.getString("dependencies(5).name"));
+
+
+        assertEquals(17, (output.length() - output.replace("- ", "").length()) / 2);
     }
 
     @Test

@@ -228,7 +228,19 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                         parent.reference.add(pointer, new TreeMap<>());
                     }
 
-                    parent.reference.get(pointer).put(name, value);
+                    try {
+                        parent.reference.get(pointer).put(name, value);
+                    }
+                    catch (IndexOutOfBoundsException e) {
+                        System.err.println("doc:" + document);
+                        System.err.println("p.ref:" + parent.reference +
+                                           ", p.ptr:" + parent.pointer +
+                                           ", p.name:" + parent.name +
+                                           ", name:" + name +
+                                           ", ptr:" + pointer +
+                                           ", val:" + value);
+                        throw e;
+                    }
                     pointer++;
                 }
                 else {

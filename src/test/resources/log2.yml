@@ -1,0 +1,16 @@
+
+logging(org.m410.garden:garden-logback:0.2-SNAPSHOT):
+  appenders:
+  - name: FILE
+    appender class: ch.qos.logback.core.FileAppender
+    layout: ch.qos.logback.classic.encoder.PatternLayoutEncoder
+    pattern: "%-4relative [%thread] %-5level %logger{35} - %msg%n"
+    file: logs/app.log
+  logger:
+  - name: org.m410
+    level: TRACE
+  - name: org.hibernate
+    level: DEBUG
+  root:
+    level: INFO
+    ref: [STDOUT,FILE]

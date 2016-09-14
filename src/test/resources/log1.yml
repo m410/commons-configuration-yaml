@@ -1,0 +1,15 @@
+
+logging(org.m410.garden:garden-logback:0.2-SNAPSHOT):
+  remote_reference: file:../../garden/garden-logback/src/main/resources/garden-logback.fab.yml
+  appenders:
+  - name: STDOUT
+    appender class: ch.qos.logback.core.ConsoleAppender
+    layout: ch.qos.logback.classic.encoder.PatternLayoutEncoder
+    pattern: "%-4relative [%thread] %-5level %class - %msg%n"
+  logger:
+  - name: org.m410
+    level: TRACE
+  root:
+    level: DEBUG
+    ref: [STDOUT]
+
