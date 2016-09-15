@@ -4,7 +4,7 @@
 
     <groupId>org.m410</groupId>
     <artifactId>yaml-configuration</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>
         Built on top of Snake Yaml and Apache Commons Configuration, this provides a way
