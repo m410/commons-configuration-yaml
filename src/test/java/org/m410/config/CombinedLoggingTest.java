@@ -8,7 +8,8 @@ import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Michael Fortin
@@ -28,12 +29,36 @@ public class CombinedLoggingTest {
         combined.addConfiguration(second);
 
         YamlConfiguration configuration = new YamlConfiguration(combined);
-        String output = null;
 
-        try (StringWriter writer = new StringWriter()) {
-            configuration.write(writer);
-            output = writer.toString();
-            System.out.println(output);
-        }
+        assertEquals(1, configuration.getMaxIndex("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT).appenders"));
+        assertEquals(2, configuration.getMaxIndex("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT).logger"));
+        assertEquals("STDOUT", configuration.getString("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT)" +
+                                                       ".appenders(0).name"));
+        //        assertEquals("FILE",configuration.getString("logging
+        // (org..m410..garden:garden-logback:0..2-SNAPSHOT).appenders(1).name"));
+
+        //        final Iterator<String> keys = configuration.getKeys();
+        //
+        //        while (keys.hasNext()) {
+        //            String next = keys.next();
+        //            System.out.println(next);
+        //        }
+
+        //        final List<ImmutableHierarchicalConfiguration> logger = configuration
+        //                .immutableConfigurationsAt("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT)");
+        //
+        //        for (ImmutableHierarchicalConfiguration log : logger) {
+        //            System.out.println(log.getString("appenders(0).name"));
+        //        }
+
+
+        //        try (StringWriter writer = new StringWriter()) {
+        //            configuration.write(writer);
+        //            System.out.println("");
+        //            System.out.println("------");
+        //            System.out.println("");
+        //            String output = writer.toString();
+        //            System.out.println(output);
+        //        }
     }
 }

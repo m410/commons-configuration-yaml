@@ -118,8 +118,8 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
 
 
     private static final class YamlBuilder extends BuilderVisitor {
-        Map<String, Object> document = new TreeMap<>();
-        List<Shadow> documentShadow = new ArrayList<>();
+        final Map<String, Object> document = new TreeMap<>();
+        final List<Shadow> documentShadow = new ArrayList<>();
 
         YamlBuilder() {
             super();
@@ -136,8 +136,8 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             final String longNodeName = toLongName(parent, handler, nodeNameEscaped);
             final Object value = node.getValue();
 
-            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName,
-                    value));
+            final Optional<Shadow> by = by(longNodeName);
+            Shadow shadow = by.orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName, value));
             shadow.syncDocument(value);
         }
 
@@ -148,27 +148,24 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             final String nodeNameEscaped = node.getNodeName().replaceAll("\\.", "\\^");
             final String longNodeName = toLongName(parent, handler, nodeNameEscaped);
 
-            Shadow shadow = by(longNodeName).orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName,
-                    value));
+            final Optional<Shadow> by = by(longNodeName);
+            Shadow shadow = by.orElseGet(() -> makeShadow(parent, handler, nodeName, longNodeName, value));
             shadow.syncDocument(value);
         }
 
         Shadow makeShadow(ImmutableNode parent, ReferenceNodeHandler handler,
                 String nodeName, String longNodeName, Object value) {
-            Shadow shadowParent = by(longNodeName.substring(0, longNodeName.lastIndexOf("."))).orElse(null);
-            Shadow newShadow = null;
+            final Shadow shadowParent = by(longNodeName.substring(0, longNodeName.lastIndexOf("."))).orElse(null);
+            final Shadow newShadow;
 
-            if (value instanceof String || value instanceof Number || value instanceof Boolean) {
-                newShadow = shadowLeaf(longNodeName, nodeName, shadowParent);
-            }
-            else if (isNodeCollection(value)) {
+            if (isNodeCollection(value)) {
                 final int count = handler.getChildrenCount(parent, nodeName);
                 newShadow = shadowCollection(longNodeName, nodeName, count, shadowParent);
             }
             else if (value instanceof Map) {
                 newShadow = shadowMap(longNodeName, nodeName, shadowParent);
             }
-            else {
+            else { // list of strings or any raw data type
                 newShadow = shadowLeaf(longNodeName, nodeName, shadowParent);
             }
 
@@ -207,71 +204,46 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         }
 
         abstract class Shadow<T> {
-            String name;
-            String longName;
-            Shadow parent;
-            T reference;
+            final String name;
+            final String longName;
+            final Shadow parent;
+            final T reference;
             int pointer = 0;
 
 
-            Shadow(String longName, String name, Shadow parent) {
+            Shadow(String longName, String name, Shadow parent, T reference) {
                 this.name = name;
                 this.longName = longName;
                 this.parent = parent;
+                this.reference = reference;
             }
 
-            void syncDocument(Object value) {
-                if (this.parent instanceof ShadowCollectionNode) {
-                    final ShadowCollectionNode parent = (ShadowCollectionNode) this.parent;
-
-                    if (parent.reference.size() <= pointer) {
-                        parent.reference.add(pointer, new TreeMap<>());
-                    }
-
-                    try {
-                        parent.reference.get(pointer).put(name, value);
-                    }
-                    catch (IndexOutOfBoundsException e) {
-                        System.err.println("doc:" + document);
-                        System.err.println("p.ref:" + parent.reference +
-                                           ", p.ptr:" + parent.pointer +
-                                           ", p.name:" + parent.name +
-                                           ", name:" + name +
-                                           ", ptr:" + pointer +
-                                           ", val:" + value);
-                        throw e;
-                    }
-                    pointer++;
-                }
-                else {
-                    ShadowMapNode parentMap = (ShadowMapNode) this.parent;
-                    parentMap.reference.put(name, value);
-                }
-            }
+            abstract void syncDocument(Object value);
 
             @Override
             public String toString() {
-                return "Shadow{" +
+                return "Shadow@" + this.hashCode() + "{" +
                        "longName='" + longName + '\'' +
                        '}';
             }
         }
 
-        class ShadowCollectionNode extends Shadow<List<Map<String, Object>>> {
+        final class ShadowCollectionNode extends Shadow<List<Map<String, Object>>> {
 
             ShadowCollectionNode(String longName, String name, int size, Shadow parent) {
-                super(longName, name, parent);
-                this.reference = new ArrayList<>();
+                super(longName, name, parent, new ArrayList<>());
                 IntStream.range(0, size).forEach(i -> this.reference.add(new TreeMap<>()));
 
                 if (parent instanceof ShadowMapNode) {
                     ((ShadowMapNode) parent).reference.put(name, this.reference);
                 }
+                else {
+                    throw new RuntimeException("list of list not implemented");
+                }
             }
 
             @Override
-            void syncDocument(Object value) {
-                // do nothing
+            void syncDocument(Object value) { // do nothing
             }
 
             @Override
@@ -280,22 +252,22 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             }
         }
 
-        class ShadowMapNode extends Shadow<Map<String, Object>> {
+        final class ShadowMapNode extends Shadow<Map<String, Object>> {
 
             ShadowMapNode(String longName, String name, Shadow parent) {
-                super(longName, name, parent);
+                super(longName, name, parent, parent == null ? document : new TreeMap<>());
 
-                if (parent == null) {
-                    this.reference = document;
-                }
-                else if (parent instanceof ShadowMapNode) {
-                    this.reference = new TreeMap<>();
-                    ((ShadowMapNode) parent).reference.put(name, reference);
+                if (parent instanceof ShadowMapNode) {
+                    ((ShadowMapNode) parent).reference.put(name, this.reference);
                 }
                 else if (parent instanceof ShadowCollectionNode) {
-                    this.reference = new TreeMap<>();
                     ((ShadowCollectionNode) parent).reference.get(pointer).put(name, this.reference);
+                    pointer++;
                 }
+            }
+
+            @Override
+            void syncDocument(Object value) { // do nothing
             }
 
             @Override
@@ -304,10 +276,27 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             }
         }
 
-        class ShadowLeafNode extends Shadow<Object> {
+        final class ShadowLeafNode extends Shadow<Object> {
 
             ShadowLeafNode(String longName, String name, Shadow parent) {
-                super(longName, name, parent);
+                super(longName, name, parent, null);
+            }
+
+            @Override
+            void syncDocument(Object value) {
+                if (this.parent instanceof ShadowCollectionNode) {
+                    final ShadowCollectionNode parent = (ShadowCollectionNode) this.parent;
+
+                    if (parent.reference.size() <= pointer) {
+                        parent.reference.add(pointer, new TreeMap<>());
+                    }
+
+                    parent.reference.get(pointer).put(name, value);
+                    pointer++;
+                }
+                else {
+                    ((ShadowMapNode) this.parent).reference.put(name, value);
+                }
             }
 
             @Override
