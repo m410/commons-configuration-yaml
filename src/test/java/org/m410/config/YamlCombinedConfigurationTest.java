@@ -46,7 +46,7 @@ public class YamlCombinedConfigurationTest {
         try (StringWriter writer = new StringWriter()) {
             configuration.write(writer);
             output = writer.toString();
-            System.out.println(output);
+            //            System.out.println(output);
         }
 
         assertEquals(16, configuration.getMaxIndex("dependencies"));

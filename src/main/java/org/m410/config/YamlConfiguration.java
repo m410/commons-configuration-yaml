@@ -18,6 +18,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * Yaml configuration that can be used with <a href="https://commons.apache.org/proper/commons-configuration/">
+ * Apache Common Configuration</a>.
+ *
+ * @author Michael Fortin
+ */
 public class YamlConfiguration extends BaseHierarchicalConfiguration implements FileBasedConfiguration {
 
     public YamlConfiguration() {
@@ -32,6 +38,11 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         super(model);
     }
 
+    public void write(Writer out) throws ConfigurationException, IOException {
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        new Yaml(options).dump(fromNode(), out);
+    }
 
     public void read(Reader in) throws ConfigurationException, IOException {
         Yaml yaml = new Yaml();
@@ -43,7 +54,7 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         getSubConfigurationParentModel().mergeRoot(top, "yaml", elemRefMap, null, this);
     }
 
-    protected ImmutableNode addChildrenToRoot(ImmutableNode root, Map<ImmutableNode, ?> elemRefMap) {
+    ImmutableNode addChildrenToRoot(ImmutableNode root, Map<ImmutableNode, ?> elemRefMap) {
         ImmutableNode top = root;
 
         for (ImmutableNode node : elemRefMap.keySet()) {
@@ -72,52 +83,44 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                ((Collection) o).iterator().next() instanceof Map;
     }
 
-    public void write(Writer out) throws ConfigurationException, IOException {
-        DumperOptions options = new DumperOptions();
-        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        new Yaml(options).dump(fromNode(), out);
-    }
-
     private Map<String, Object> fromNode() {
         final YamlBuilder visitor = new YamlBuilder();
         NodeTreeWalker.INSTANCE.walkBFS(getNodeModel().getRootNode(), visitor, getNodeModel().getNodeHandler());
         return visitor.getDocument();
     }
 
-    protected Map<ImmutableNode, ?> toNodeMap(Object load) {
+    Map<ImmutableNode, ?> toNodeMap(Object load) {
         final Map<String, ?> map = (Map<String, ?>) load;
         final Map<ImmutableNode, Object> nodeMap = new HashMap<>();
 
         for (String key : map.keySet()) {
             Object value = map.get(key);
 
-            if (value instanceof String || value instanceof Number || value instanceof Boolean) {
-                ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
-                nodeMap.put(currentNode, value);
-            }
-            else if (value instanceof Map) {
+            if (value instanceof Map) {
                 ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
                 nodeMap.put(currentNode, toNodeMap(value));
             }
-            else if (value instanceof Collection) {
-
-                if (isNodeCollection(value)) {
-                    ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
-                    Collection<Map<String, ?>> valueMaps = (Collection<Map<String, ?>>) value;
-                    nodeMap.put(currentNode, valueMaps.stream().map(vm -> toNodeMap(vm)).collect(Collectors.toList()));
-                }
-                else {
-                    ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
-                    nodeMap.put(currentNode, value);
-                }
+            else if (isNodeCollection(value)) {
+                ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(value).create();
+                Collection<Map<String, ?>> valueMaps = (Collection<Map<String, ?>>) value;
+                nodeMap.put(currentNode, valueMaps.stream().map(vm -> toNodeMap(vm)).collect(Collectors.toList()));
+            }
+            else {
+                // not sure if this is good idea, key doesn't output if value is null.  setting to empty string
+                // will fix that, but it's not accurate.
+                Object outVal = (value != null ? value : "");
+                ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(outVal).create();
+                nodeMap.put(currentNode, outVal);
             }
         }
 
         return nodeMap;
     }
 
-
-    private static final class YamlBuilder extends BuilderVisitor {
+    /**
+     * This has to be here, because it's overriding an inner class in the superclass.
+     */
+    private final class YamlBuilder extends BuilderVisitor {
         final Map<String, Object> document = new TreeMap<>();
         final List<Shadow> documentShadow = new ArrayList<>();
 
@@ -203,6 +206,9 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
             return new ShadowCollectionNode(longName, name, size, parent);
         }
 
+        /**
+         * @param <T> the type of the node shadow
+         */
         abstract class Shadow<T> {
             final String name;
             final String longName;
@@ -304,6 +310,5 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                 return "Leaf" + super.toString();
             }
         }
-
     }
 }
