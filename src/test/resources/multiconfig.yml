@@ -1,0 +1,10 @@
+# test file
+common_value: this is default
+
+---
+environment: development
+common_value: this is development
+
+---
+environment: production
+common_value: this is production

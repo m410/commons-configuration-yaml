@@ -24,8 +24,14 @@ import java.util.stream.IntStream;
  *
  * @author Michael Fortin
  */
-public class YamlConfiguration extends BaseHierarchicalConfiguration implements FileBasedConfiguration {
+public final class YamlConfiguration extends BaseHierarchicalConfiguration implements FileBasedConfiguration {
+    private int multiConfigIndex = -1;
+    private String keyName;
+    private Object keyValue;
 
+    /**
+     * Default constructor that loads the first configuration if there are more than one.
+     */
     public YamlConfiguration() {
         super();
     }
@@ -38,6 +44,28 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
         super(model);
     }
 
+    /**
+     * This constructor is for selecting a configuration from a file that contains many by index.
+     *
+     * @param configIndex the zero based index of the configuration to parse.
+     */
+    public YamlConfiguration(int configIndex) {
+        super();
+        multiConfigIndex = configIndex;
+    }
+
+    /**
+     * Assumes the file root node is a map, and checks for a key value pair with the given values.
+     *
+     * @param keyName the key to look for.
+     * @param keyVal  the value of the key.
+     */
+    public YamlConfiguration(String keyName, Object keyVal) {
+        super();
+        this.keyName = keyName;
+        this.keyValue = keyVal;
+    }
+
     public void write(Writer out) throws ConfigurationException, IOException {
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -45,13 +73,41 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
     }
 
     public void read(Reader in) throws ConfigurationException, IOException {
-        Yaml yaml = new Yaml();
         ImmutableNode.Builder rootBuilder = new ImmutableNode.Builder();
         ImmutableNode root = rootBuilder.create();
 
-        Map<ImmutableNode, ?> elemRefMap = toNodeMap(yaml.loadAll(in).iterator().next());
+        final Map<String, ?> load = load(in);
+        Map<ImmutableNode, ?> elemRefMap = toNodeMap(load);
         ImmutableNode top = addChildrenToRoot(root, elemRefMap);
         getSubConfigurationParentModel().mergeRoot(top, "yaml", elemRefMap, null, this);
+    }
+
+    private Map<String, ?> load(Reader in) {
+        Yaml yaml = new Yaml();
+        final Iterable<Object> objects = yaml.loadAll(in);
+
+        if (multiConfigIndex >= 0) {
+            final ArrayList<Object> out = new ArrayList<>();
+            objects.forEach(out::add);
+            return (Map<String, ?>) out.get(multiConfigIndex);
+        }
+        if (keyName != null && keyValue != null) {
+            Map<String, ?> toReturn = new HashMap<>();
+            final Iterator<Object> iterator = objects.iterator();
+
+            while (iterator.hasNext()) {
+                Map<String, ?> map = (Map<String, ?>) iterator.next();
+
+                if (map.containsKey(keyName) && map.get(keyName).equals(keyValue)) {
+                    toReturn = map;
+                }
+            }
+            return toReturn;
+        }
+        else {
+            return (Map<String, ?>) objects.iterator().next();
+        }
+
     }
 
     ImmutableNode addChildrenToRoot(ImmutableNode root, Map<ImmutableNode, ?> elemRefMap) {
@@ -106,9 +162,9 @@ public class YamlConfiguration extends BaseHierarchicalConfiguration implements 
                 nodeMap.put(currentNode, valueMaps.stream().map(vm -> toNodeMap(vm)).collect(Collectors.toList()));
             }
             else {
-                // not sure if this is good idea, key doesn't output if value is null.  setting to empty string
+                // not sure if this is good idea, key doesn't output if value is null.  setting to map
                 // will fix that, but it's not accurate.
-                Object outVal = (value != null ? value : "");
+                Object outVal = (value != null ? value : new TreeMap<>());
                 ImmutableNode currentNode = new ImmutableNode.Builder().name(key).value(outVal).create();
                 nodeMap.put(currentNode, outVal);
             }

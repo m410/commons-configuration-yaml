@@ -1,7 +1,5 @@
 package org.m410.config;
 
-import org.apache.commons.configuration2.BaseHierarchicalConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ImmutableHierarchicalConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
@@ -37,42 +35,48 @@ public final class YamlConfig {
         return environments;
     }
 
-    public static BaseHierarchicalConfiguration load(String relativePath) throws ConfigurationException {
+    public static YamlConfiguration load(String relativePath) throws ConfigurationException {
         return new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFileName(relativePath))
                 .getConfiguration();
     }
 
-    public static BaseHierarchicalConfiguration load(File yamlFile) throws ConfigurationException {
+    public static YamlConfiguration load(File yamlFile) throws ConfigurationException {
         return new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFile(yamlFile))
                 .getConfiguration();
     }
 
-    public static BaseHierarchicalConfiguration load(URL url) throws ConfigurationException {
+    public static YamlConfiguration load(URL url) throws ConfigurationException {
         return new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setURL(url))
                 .getConfiguration();
     }
 
-    public static BaseHierarchicalConfiguration load(String relativePath, String env) throws ConfigurationException {
-        System.setProperty("fabricate.env",env);
-        final YamlEnvConfiguration envConfiguration = new FileBasedConfigurationBuilder<>(YamlEnvConfiguration.class)
-                .configure(new Parameters().hierarchical().setFileName(relativePath))
-                .getConfiguration();
-        System.clearProperty("fabricate.env");
+    public static YamlConfiguration load(String relativePath, String env) throws ConfigurationException {
+        final YamlConfiguration configuration = new YamlConfiguration("environment", env);
 
-        return envConfiguration;
+        try (FileReader reader = new FileReader(new File(relativePath))) {
+            configuration.read(reader);
+        }
+        catch (IOException e) {
+            throw new ConfigurationException(e);
+        }
+
+        return configuration;
     }
 
-    public static BaseHierarchicalConfiguration load(File file, String env) throws ConfigurationException {
-        System.setProperty("fabricate.env",env);
-        final YamlEnvConfiguration envConfiguration = new FileBasedConfigurationBuilder<>(YamlEnvConfiguration.class)
-                .configure(new Parameters().hierarchical().setFile(file))
-                .getConfiguration();
-        System.clearProperty("fabricate.env");
+    public static YamlConfiguration load(File file, String env) throws ConfigurationException {
+        final YamlConfiguration configuration = new YamlConfiguration("environment", env);
 
-        return envConfiguration;
+        try (FileReader reader = new FileReader(file)) {
+            configuration.read(reader);
+        }
+        catch (IOException e) {
+            throw new ConfigurationException(e);
+        }
+
+        return configuration;
     }
 
     public static void write(ImmutableHierarchicalConfiguration c, File file)  {
