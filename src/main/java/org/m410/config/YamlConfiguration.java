@@ -299,8 +299,9 @@ public final class YamlConfiguration extends BaseHierarchicalConfiguration imple
                 if (parent instanceof ShadowMapNode) {
                     ((ShadowMapNode) parent).reference.put(name, this.reference);
                 }
-                else {
-                    throw new RuntimeException("list of list not implemented");
+                else if (parent instanceof ShadowCollectionNode) {
+                    ((ShadowCollectionNode) parent).reference.get(pointer).put(name, this.reference);
+                    pointer++;
                 }
             }
 
