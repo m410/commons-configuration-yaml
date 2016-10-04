@@ -23,7 +23,7 @@ public class MinimalConfigTest {
                 .getConfiguration();
 
         assertNotNull(first);
-        assertTrue(first.containsKey("persistence(org..m410..garden:garden-jpa:0..2-SNAPSHOT)"));
+        assertTrue(first.containsKey("persistence(org..m410..garden:garden-jpa:0..3-SNAPSHOT)"));
 
         String output = null;
 

@@ -1,5 +1,5 @@
 
-logging(org.m410.garden:garden-logback:0.2-SNAPSHOT):
+logging(org.m410.garden:garden-logback:0.3-SNAPSHOT):
   appenders:
   - name: FILE
     appender class: ch.qos.logback.core.FileAppender

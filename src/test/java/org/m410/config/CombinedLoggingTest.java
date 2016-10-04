@@ -30,9 +30,9 @@ public class CombinedLoggingTest {
 
         YamlConfiguration configuration = new YamlConfiguration(combined);
 
-        assertEquals(1, configuration.getMaxIndex("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT).appenders"));
-        assertEquals(2, configuration.getMaxIndex("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT).logger"));
-        assertEquals("STDOUT", configuration.getString("logging(org..m410..garden:garden-logback:0..2-SNAPSHOT)" +
+        assertEquals(1, configuration.getMaxIndex("logging(org..m410..garden:garden-logback:0..3-SNAPSHOT).appenders"));
+        assertEquals(2, configuration.getMaxIndex("logging(org..m410..garden:garden-logback:0..3-SNAPSHOT).logger"));
+        assertEquals("STDOUT", configuration.getString("logging(org..m410..garden:garden-logback:0..3-SNAPSHOT)" +
                                                        ".appenders(0).name"));
         //        assertEquals("FILE",configuration.getString("logging
         // (org..m410..garden:garden-logback:0..2-SNAPSHOT).appenders(1).name"));

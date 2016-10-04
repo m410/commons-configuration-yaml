@@ -1,5 +1,5 @@
 
-logging(org.m410.garden:garden-logback:0.2-SNAPSHOT):
+logging(org.m410.garden:garden-logback:0.3-SNAPSHOT):
   remote_reference: file:../../garden/garden-logback/src/main/resources/garden-logback.fab.yml
   appenders:
   - name: STDOUT

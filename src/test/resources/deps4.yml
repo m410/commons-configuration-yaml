@@ -2,7 +2,7 @@ dependencies:
   - { scope: compile, org: org.m410.garden, name: garden, rev: 0.2.0-SNAPSHOT }
   - { scope: compile, org: com.google.code.gson, name: gson, rev: 2.2.4 }
   - { scope: compile, org: org.slf4j, name: slf4j-api, rev: 1.7.7 }
-  - { scope: compile, org: org.m410, name: yaml-configuration, rev: 0.2-SNAPSHOT}
+  - { scope: compile, org: org.m410, name: yaml-configuration, rev: 0.3-SNAPSHOT }
   - { scope: compile, org: com.google.guava, name: guava, rev: "18.0"}
   - { scope: compile, org: com.fasterxml, name: classmate, rev: 1.1.0 }
   - { scope: provided, org: org.glassfish.web, name: javax.el, rev: 2.2.6 }

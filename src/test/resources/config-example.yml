@@ -1,7 +1,7 @@
-archetype: {name: garden, version: 0.2-SNAPSHOT, organization: org.m410.fabricate}
+archetype: {name: garden, version: 0.3-SNAPSHOT, organization: org.m410.fabricate}
 application: {name: demo2, organization: org.m410.demo, version: 1.0-SNAPSHOT, packageName: org.m410,
   applicationClass: org.m410.angular.web.MyApplication, author: Michael Fortin, description: My Demo App}
-persistence(org.m410.garden:garden-jpa:0.2-SNAPSHOT):
+persistence(org.m410.garden:garden-jpa:0.3-SNAPSHOT):
   remote_reference: file:../../garden/garden-jpa/src/main/resources/garden-jpa.fab.yml
   user_orm_builder: true
   properties: {hibernate.dialect: org.hibernate.dialect.H2Dialect, hibernate.connection.driver_class: org.h2.Driver,
@@ -14,19 +14,19 @@ build: {defaultEnvironment: development, defaultCommand: make, lang: java, langV
   resourceDir: src/resources, testDir: test/java, testOutputDir: target/test-classes,
   testResourceDir: test/resources, packageSource: false, packageDocs: false, packageName: null}
 bundles:
-- {name: fab-share, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-share/target/fab-share-0.2-SNAPSHOT.jar'}
-- {name: fab-java-garden-project, org: org.m410.fabricate, version: 0.2-SNAPSHOT,
-  remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-garden-project/target/garden-0.2-SNAPSHOT.jar'}
-- {name: fab-war, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-war/target/fab-war-0.2-SNAPSHOT.jar'}
-- {name: fab-junit, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-junit/target/fab-junit-0.2-SNAPSHOT.jar'}
-- {name: fab-java-compiler, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-compiler/target/fab-java-compiler-0.2-SNAPSHOT.jar'}
-- {name: fab-dependencies, org: org.m410.fabricate, version: 0.2-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-dependencies/target/fab-java-dependencies-0.2-SNAPSHOT.jar'}
-modules(org.m410.garden:garden-jetty9:0.2-SNAPSHOT): {remote_reference: 'file:../../garden/garden-jetty9/src/main/resources/garden-jetty9.fab.yml'}
-modules(org.m410.garden:garden-jpa:0.2-SNAPSHOT):
+- {name: fab-share, org: org.m410.fabricate, version: 0.3-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-share/target/fab-share-0.3-SNAPSHOT.jar'}
+- {name: fab-java-garden-project, org: org.m410.fabricate, version: 0.3-SNAPSHOT,
+  remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-garden-project/target/garden-0.3-SNAPSHOT.jar'}
+- {name: fab-war, org: org.m410.fabricate, version: 0.3-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-war/target/fab-war-0.3-SNAPSHOT.jar'}
+- {name: fab-junit, org: org.m410.fabricate, version: 0.3-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-junit/target/fab-junit-0.3-SNAPSHOT.jar'}
+- {name: fab-java-compiler, org: org.m410.fabricate, version: 0.3-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-compiler/target/fab-java-compiler-0.3-SNAPSHOT.jar'}
+- {name: fab-dependencies, org: org.m410.fabricate, version: 0.3-SNAPSHOT, remote_reference: 'file:/Users/m410/Projects/m410.org/fabricate/fab-java-dependencies/target/fab-java-dependencies-0.3-SNAPSHOT.jar'}
+modules(org.m410.garden:garden-jetty9:0.3-SNAPSHOT): {remote_reference: 'file:../../garden/garden-jetty9/src/main/resources/garden-jetty9.fab.yml'}
+modules(org.m410.garden:garden-jpa:0.3-SNAPSHOT):
   properties: {hibernate.dialect: org.hibernate.dialect.H2Dialect, hibernate.connection.driver_class: org.h2.Driver,
     hibernate.connection.username: sa, hibernate.connection.password: '', hibernate.connection.url: 'jdbc:h2:db/demo;AUTO_SERVER=TRUE',
     hibernate.hbm2ddl.auto: update}
-logging(org.m410.garden:garden-logback:0.2-SNAPSHOT):
+logging(org.m410.garden:garden-logback:0.3-SNAPSHOT):
   appenders:
   - {name: STDOUT, appender class: ch.qos.logback.core.ConsoleAppender, layout: ch.qos.logback.classic.encoder.PatternLayoutEncoder,
     pattern: '%-4relative [%thread] %-5level %class - %msg%n'}
