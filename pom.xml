@@ -2,8 +2,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.m410</groupId>
-    <artifactId>yaml-configuration</artifactId>
-    <version>0.3</version>
+    <artifactId>commons-configuration2-yaml</artifactId>
+    <version>0.4</version>
     <packaging>jar</packaging>
     <description>
         Built on top of Snake Yaml and Apache Commons Configuration, this provides a way
