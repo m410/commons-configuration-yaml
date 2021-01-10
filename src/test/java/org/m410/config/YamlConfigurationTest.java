@@ -2,14 +2,14 @@ package org.m410.config;
 
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Michael Fortin
@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class YamlConfigurationTest {
     YamlConfiguration config;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         config = new FileBasedConfigurationBuilder<>(YamlConfiguration.class)
                 .configure(new Parameters().hierarchical().setFileName("src/test/resources/test1.yml"))
